@@ -1,0 +1,5 @@
+# Reviewed documentation examples in installed skills (not credentials).
+# fnox-security-best-practices: deliberately insecure example in the documentation.
+.agents/skills/fnox-security-best-practices/SKILL.md:generic-api-key:26
+# mise-environment-management: deliberately insecure example in the documentation.
+.agents/skills/mise-environment-management/SKILL.md:generic-api-key:403

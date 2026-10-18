@@ -79,3 +79,12 @@ docs/devdocs.md
 .agents/
 .mcpregistry_github_token
 .mcpregistry_registry_token
+
+# Local environment overrides, age identities and secret-scanner reports
+mise.local.toml
+.mise.local.toml
+fnox.local.toml
+.fnox.local.toml
+age.txt
+*.agekey
+gitleaks-report.*
