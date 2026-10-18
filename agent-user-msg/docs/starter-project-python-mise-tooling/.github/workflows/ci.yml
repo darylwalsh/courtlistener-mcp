@@ -1,0 +1,29 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # full history for betterleaks and commit-message checks
+
+      # Installs python, uv, fnox, age and betterleaks at the versions in mise.toml.
+      - uses: jdx/mise-action@v3
+
+      - name: Check
+        run: mise run ci
+
+      - name: Commit messages follow Conventional Commits
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: uv run --frozen cz check --rev-range "origin/$BASE_REF..HEAD"

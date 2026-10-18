@@ -1,0 +1,143 @@
+# mise: tool versions + env + tasks. This is the one entry point for
+# humans, CI and coding agents. Run `mise tasks` to list everything.
+#
+# Python packages (ruff, pyrefly, ty, pytest, commitizen, prek) are pinned
+# in uv.lock instead. mise only installs things that are not on PyPI.
+
+[tools]
+python = "3.13"
+uv = "latest"
+fnox = "latest"                              # encrypted secrets
+age = "latest"                               # age-keygen for fnox
+"github:betterleaks/betterleaks" = "latest"  # secret-leak scanner
+
+[env]
+# Auto-activate the project venv whenever you cd into the repo.
+_.python.venv = { path = ".venv", create = true }
+# Use the interpreter mise installed; never let uv fetch its own.
+UV_PYTHON_DOWNLOADS = "never"
+# Respect a caller's XDG location; avoid the legacy machine-specific paths.
+XDG_CONFIG_HOME = "{{env.XDG_CONFIG_HOME | default(value=env.HOME ~ '/.config')}}"
+PYTHONUNBUFFERED = "1"
+
+[task_config]
+includes = ["mise-tasks", ".mise-tasks", ".mise/tasks", ".config/mise/tasks", "mise/tasks", "tasks/*.toml"]
+
+[hooks]
+# Fresh clone: `mise install` also syncs deps and wires git hooks.
+postinstall = '[ -n "${CI:-}" ] || mise run setup'  # skipped in CI
+
+# ------------------------------------------------------------------ setup
+
+[tasks.init]
+description = "Turn this template into a new project: mise run init <package_name>"
+usage = 'arg "<package_name>" help="Python package name in snake_case"'
+run = [
+  'bash scripts/rename.sh "${usage_package_name?}"',
+  "git init -q 2>/dev/null || true",
+  "mise run setup",
+]
+
+[tasks.setup]
+description = "Install deps and git hooks"
+run = [
+  "uv sync --locked --all-groups",
+  "uv run --frozen prek install --install-hooks",
+]
+
+[tasks."secrets:init"]
+description = "Create your age key (if needed) and add it as an fnox recipient"
+run = "bash scripts/secrets-init.sh"
+
+# ------------------------------------------------------------- dev loop
+
+[tasks.fmt]
+description = "Auto-fix lint issues and format"
+run = [
+  "uv run --frozen ruff check --fix",
+  "uv run --frozen ruff format",
+]
+
+[tasks.lint]
+description = "Lint and check formatting (no changes)"
+run = [
+  "uv run --frozen ruff check",
+  "uv run --frozen ruff format --check",
+]
+
+[tasks.typecheck]
+description = "Type check with pyrefly (CI gate)"
+run = "uv run --frozen pyrefly check"
+
+[tasks."typecheck:ty"]
+description = "Type check with ty (second opinion, non-blocking)"
+run = "uv run --frozen ty check"
+
+[tasks.test]
+description = "Run tests with coverage (skips slow/gpu/integration)"
+run = "uv run --frozen pytest --cov -m 'not slow and not gpu and not integration'"
+
+[tasks."test:all"]
+description = "Run every test, with secrets loaded for integration tests"
+run = "fnox exec -- uv run --frozen pytest --cov"
+
+[tasks.run]
+description = "Run a command with secrets loaded: mise run run -- python -m starter"
+run = "fnox exec -- uv run --frozen"
+
+[tasks."secrets:exec"]
+description = "Run any tool/editor with secrets: mise run secrets:exec -- <command>"
+run = "fnox exec --"
+
+# ------------------------------------------------------------- security
+
+[tasks.audit]
+description = "Check dependencies for known CVEs (OSV)"
+run = "uv audit --preview-features audit"
+
+[tasks."secrets:scan"]
+description = "Scan the full git history for leaked secrets"
+run = "betterleaks git . --redact --verbose"
+
+[tasks."secrets:check"]
+description = "Reject plaintext fnox entries without needing a private key"
+run = "uv run --frozen python scripts/check_secrets.py"
+
+[tasks."lock:check"]
+description = "Fail if uv.lock is out of date with pyproject.toml"
+run = "uv lock --check"
+
+# ------------------------------------------------------------ the gates
+
+[tasks.check]
+description = "Everything CI runs. Agents: run this before saying you're done."
+depends = ["lint", "typecheck", "test", "audit", "secrets:scan", "secrets:check", "lock:check"]
+
+[tasks.ci]
+description = "CI entry point: frozen install, then the full check"
+run = [
+  "uv sync --locked --all-groups",
+  "mise run check",
+]
+
+[tasks.hooks]
+description = "Run every git hook against every file"
+run = "uv run --frozen prek run --all-files"
+
+# -------------------------------------------------------------- release
+
+[tasks.commit]
+description = "Guided Conventional Commit"
+run = "uv run --frozen cz commit"
+
+[tasks.bump]
+description = "Bump version from commits, update CHANGELOG, tag"
+run = "uv run --frozen cz bump"
+
+[tasks.build]
+description = "Build sdist and wheel into dist/"
+run = "uv build"
+
+[tasks.clean]
+description = "Remove build, cache and coverage artifacts"
+run = "rm -rf dist build .pytest_cache .ruff_cache .coverage htmlcov"

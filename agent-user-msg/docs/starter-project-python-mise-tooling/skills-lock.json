@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "skills": {
+    "fnox": {
+      "source": "jdx/fnox",
+      "sourceType": "github",
+      "skillPath": "skills/fnox/SKILL.md",
+      "computedHash": "7f70f6fd7225b7717b791be91f2487f7f0c4e70b47007f81be7763f23b76f2b0"
+    },
+    "fnox-configuration": {
+      "source": "thebushidocollective/han",
+      "sourceType": "github",
+      "skillPath": "plugins/specialized/fnox/skills/configuration/SKILL.md",
+      "computedHash": "4b1782578a7d15bc39bd2ad1a6b9748496e82126e2696268116d1e49bb6fc267"
+    },
+    "fnox-providers": {
+      "source": "thebushidocollective/han",
+      "sourceType": "github",
+      "skillPath": "plugins/specialized/fnox/skills/providers/SKILL.md",
+      "computedHash": "733b50fcc4b3b2c7558199dd5e57fa75e24cd7dba010b28154f9a5d6bc7af426"
+    },
+    "fnox-security-best-practices": {
+      "source": "thebushidocollective/han",
+      "sourceType": "github",
+      "skillPath": "plugins/specialized/fnox/skills/security-best-practices/SKILL.md",
+      "computedHash": "0e548b76a0686ab916e8a0ca55119bdbf40d8755e320d51069a3d8c3bc5c67b9"
+    },
+    "gopass": {
+      "source": "skills.volces.com",
+      "sourceUrl": "https://skills.volces.com/skills/clawhub/erdgeclaw",
+      "sourceType": "well-known",
+      "computedHash": "3a2a81e674201029b92562f9e63a995593a55d3b4ae35bdf1304b358d2357925",
+      "wellKnownDigest": "sha256:f6ea007f2ef582db3a13fbaa62282a013fadcb64a58a3a562d7afdaa5e0a120a"
+    },
+    "pass": {
+      "source": "skills.volces.com",
+      "sourceUrl": "https://skills.volces.com/skills/clawhub/bastos",
+      "sourceType": "well-known",
+      "computedHash": "74d45e761d400d0bbc296230a14c4db7570124e41053b47264e2fbefab120163",
+      "wellKnownDigest": "sha256:69a9deeda305bd859c3df3e53f06cb21a2ff471149cc5899272ac6b67af9ed46"
+    },
+    "vp-cspell": {
+      "source": "vdustr/skills",
+      "sourceType": "github",
+      "skillPath": "skills/vp-cspell/SKILL.md",
+      "computedHash": "9ec40f74e8f0d0199d302f035c2b03f49c3f029ed1cee27de5c20f65373ad1df"
+    }
+  }
+}
