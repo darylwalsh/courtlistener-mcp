@@ -1,6 +1,6 @@
 # main - Directory Structure
 
-Generated on: 2026-10-18 12:52:37
+Generated on: 2026-10-18 13:06:04
 
 ```text
 main/
@@ -36,6 +36,7 @@ main/
 ├── docs/
 │   ├── agents/
 │   │   ├── domain.md
+│   │   ├── handoff.md
 │   │   ├── issue-tracker.md
 │   │   ├── setup-checklist.md
 │   │   └── triage-labels.md

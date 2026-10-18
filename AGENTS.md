@@ -11,6 +11,12 @@
 
 **Canonical agent instructions:** Maintain this repository's protocol in `AGENTS.md`. When an upstream skill selects or updates the root `CLAUDE.md`, apply that step to `AGENTS.md` instead. Keep the root free of a duplicate `CLAUDE.md`; the dependency's framework reference above retains its upstream filename.
 
+## Session continuity
+
+When resuming work or choosing the next task, read [the handoff](docs/agents/handoff.md), then verify the working tree, current branch, and live PR state. The handoff records completed work, validation limits, follow-ups, and local files left outside commits. At session close, refresh it with the actual results and any remaining work; keep lasting conventions in this file.
+
+Target this fork explicitly for GitHub operations: `gh ... --repo darylwalsh/courtlistener-mcp`. Some package and publishing metadata still identifies upstream; changing the fork's published identity is a separate decision.
+
 ---
 
 ## What's Next?
