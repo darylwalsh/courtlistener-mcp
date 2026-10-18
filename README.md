@@ -286,7 +286,7 @@ Or with Docker:
 For Streamable HTTP, set the transport and start the server:
 
 ```sh
-MCP_TRANSPORT_TYPE=http MCP_HTTP_PORT=3010 COURTLISTENER_API_TOKEN=... bun run start:http
+mise run start:http
 # Server listens at http://localhost:3010/mcp
 ```
 
@@ -300,27 +300,34 @@ MCP_TRANSPORT_TYPE=http MCP_HTTP_PORT=3010 COURTLISTENER_API_TOKEN=... bun run s
 1. **Clone the repository:**
 
 ```sh
-git clone https://github.com/cyanheads/courtlistener-mcp-server.git
+git clone https://github.com/darylwalsh/courtlistener-mcp.git
 ```
 
 2. **Navigate into the directory:**
 
 ```sh
-cd courtlistener-mcp-server
+cd courtlistener-mcp
 ```
 
 3. **Install dependencies:**
 
 ```sh
-bun install
+mise trust
+mise install
+mise run setup
 ```
 
 4. **Configure environment:**
 
 ```sh
-cp .env.example .env
-# edit .env and set COURTLISTENER_API_TOKEN
+mise run secrets:init
+# Use the existing matching age identity to decrypt this fork's encrypted config.
+mise run secrets:verify
 ```
+
+See [development tooling](docs/tooling.md) for age identity setup, adding credentials
+through fnox's hidden prompt, and creating a new independent secret configuration.
+`.env.example` documents variable names; store credentials in `fnox.toml` through fnox.
 
 ## Configuration
 
@@ -349,25 +356,30 @@ See [`.env.example`](./.env.example) for the full list of optional overrides.
 
 ### Local development
 
+Use [mise](https://mise.jdx.dev/) for the pinned toolchain and project tasks. Start with `mise run setup`, then follow [the tooling guide](./docs/tooling.md) to initialize age-encrypted fnox storage with `mise run secrets:init` and verify access with `mise run secrets:verify`. Startup tasks inject the stored API token. Setup, builds, and ordinary checks work without decrypting secrets.
+
 - **Build and run:**
 
   ```sh
   # One-time build
-  bun run rebuild
+  mise run rebuild
 
   # Run the built server
-  bun run start:stdio
+  mise run start:stdio
   # or
-  bun run start:http
+  mise run start:http
   ```
 
 - **Run checks and tests:**
 
   ```sh
-  bun run devcheck   # Lint, format, typecheck, security
-  bun run test       # Vitest test suite
-  bun run lint:mcp   # Validate MCP definitions against spec
+  mise run check      # Read-only checks, tests, and secret-leak guards
+  mise run fmt        # Apply safe formatting fixes
+  mise run test       # Vitest through the existing bun run test script
+  mise run lint:mcp   # Validate MCP definitions against spec
   ```
+
+Use `mise tasks` for the full task list and `mise run secrets:exec -- <command>` for another command that needs encrypted secrets. Preserve existing project Python code and tooling; use TypeScript when adapting the Python reference project's configuration.
 
 ### Docker
 
@@ -387,12 +399,12 @@ The Dockerfile defaults to HTTP transport, stateless session mode, and logs to `
 | `src/mcp-server/tools` | Tool definitions (`*.tool.ts`). 14 tools across opinions, citations, dockets, parties, judges, courts, oral arguments, and financial disclosures. |
 | `src/mcp-server/resources` | Resource definitions (`*.resource.ts`). Court reference resource. |
 | `src/mcp-server/prompts` | Prompt definitions (`*.prompt.ts`). Legal research prompt. |
-| `src/services/courtlistener` | CourtListener API client (request pacing, retry, error classification), code tables, and the bundled court snapshot (`bun run courts:snapshot` regenerates it). |
+| `src/services/courtlistener` | CourtListener API client (request pacing, retry, error classification), code tables, and the bundled court snapshot (`mise run courts:snapshot` regenerates it). |
 | `tests/` | Unit and integration tests mirroring `src/`. |
 
 ## Development guide
 
-See [`CLAUDE.md`](./CLAUDE.md) for development guidelines and architectural rules. The short version:
+See [`AGENTS.md`](./AGENTS.md) for the canonical development guidelines and architectural rules, and [docs/tooling.md](./docs/tooling.md) for tools, tasks, and encrypted secrets. The short version:
 
 - Handlers throw, framework catches — no `try/catch` in tool logic
 - Use `ctx.log` for request-scoped logging, `ctx.state` for tenant-scoped storage
@@ -404,8 +416,7 @@ See [`CLAUDE.md`](./CLAUDE.md) for development guidelines and architectural rule
 Issues are welcome. Run checks and tests before submitting:
 
 ```sh
-bun run devcheck
-bun run test
+mise run check
 ```
 
 ## License

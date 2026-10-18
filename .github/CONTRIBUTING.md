@@ -2,9 +2,11 @@
 
 Thanks for using `courtlistener-mcp-server`. Bugs, feature requests, and documentation gaps all belong in an issue — that's where they get read and picked up.
 
-Open one from the **Issues** tab and pick the [**Bug Report**](https://github.com/cyanheads/courtlistener-mcp-server/issues/new?template=bug_report.yml) or [**Feature Request**](https://github.com/cyanheads/courtlistener-mcp-server/issues/new?template=feature_request.yml) form. Both are structured, and filling in the fields is what makes an issue actionable.
+Open one from this fork's **Issues** tab and pick the [**Bug Report**](https://github.com/darylwalsh/courtlistener-mcp/issues/new?template=bug_report.yml) or [**Feature Request**](https://github.com/darylwalsh/courtlistener-mcp/issues/new?template=feature_request.yml) form. Both are structured, and filling in the fields is what makes an issue actionable.
 
 PRs welcome; open an issue first for anything larger than a typo.
+
+Run `mise install` and `mise run setup` to prepare the toolchain and dependencies, and `mise run check` before submitting a change. See [the tooling guide](../docs/tooling.md) for tasks and encrypted secrets, and [AGENTS.md](../AGENTS.md) for the repository's canonical development protocol and gated release workflow.
 
 ## Server bug or framework bug?
 

@@ -1,9 +1,9 @@
-# courtlistener-mcp-server - Directory Structure
+# main - Directory Structure
 
-Generated on: 2026-10-18 08:57:18
+Generated on: 2026-10-18 12:52:37
 
 ```text
-courtlistener-mcp-server/
+main/
 ├── .claude-plugin/
 │   └── plugin.json
 ├── .codex-plugin/
@@ -34,8 +34,18 @@ courtlistener-mcp-server/
 │   ├── 0.8.x/
 │   └── template.md
 ├── docs/
+│   ├── agents/
+│   │   ├── domain.md
+│   │   ├── issue-tracker.md
+│   │   ├── setup-checklist.md
+│   │   └── triage-labels.md
+│   ├── decisions/
+│   │   ├── 0000-use-adrs.md
+│   │   ├── 0001-development-tooling.md
+│   │   └── EXAMPLE-ADR-0002-hook-architecture.md
 │   ├── design.md
-│   └── idea.md
+│   ├── idea.md
+│   └── tooling.md
 ├── framework-skills/
 │   ├── add-app-tool/
 │   │   └── SKILL.md
@@ -129,6 +139,7 @@ courtlistener-mcp-server/
 │   ├── check-dependency-specifiers.ts
 │   ├── check-docs-sync.ts
 │   ├── check-framework-antipatterns.ts
+│   ├── check-secrets.ts
 │   ├── check-skill-versions.ts
 │   ├── check-skills-sync.ts
 │   ├── clean-mcpb.ts
@@ -141,7 +152,9 @@ courtlistener-mcp-server/
 │   ├── list-skills.ts
 │   ├── prune-musl-packages.ts
 │   ├── release-github.ts
-│   └── tree.ts
+│   ├── secrets-init.ts
+│   ├── tree.ts
+│   └── verify-secrets.ts
 ├── src/
 │   ├── config/
 │   │   └── server-config.ts
@@ -204,6 +217,8 @@ courtlistener-mcp-server/
 │   │   ├── readable-text.test.ts
 │   │   ├── retrieval.test.ts
 │   │   └── uri.test.ts
+│   ├── tooling/
+│   │   └── secrets.test.ts
 │   ├── tools/
 │   │   ├── attorney-budget.test.ts
 │   │   ├── bounded-pages.test.ts
@@ -228,9 +243,12 @@ courtlistener-mcp-server/
 │   │   └── search-query-contracts.test.ts
 │   └── security.test.ts
 ├── .dockerignore
+├── .editorconfig
 ├── .env.example
 ├── .gitattributes
 ├── .gitignore
+├── .gitleaks.toml
+├── .gitleaksignore
 ├── .mcpbignore
 ├── AGENTS.md
 ├── biome.json
@@ -238,14 +256,16 @@ courtlistener-mcp-server/
 ├── bunfig.toml
 ├── CHANGELOG.md
 ├── CITATION.cff
-├── CLAUDE.md
 ├── devcheck.config.json
 ├── Dockerfile
+├── fnox.toml
 ├── LICENSE
 ├── manifest.json
+├── mise.toml
 ├── package.json
 ├── README.md
 ├── server.json
+├── skills-lock.json
 ├── tsconfig.build.json
 ├── tsconfig.json
 └── vitest.config.ts
