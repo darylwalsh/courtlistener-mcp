@@ -9,13 +9,15 @@
 
 > **Read the framework docs first:** `node_modules/@cyanheads/mcp-ts-core/CLAUDE.md` contains the full API reference — builders, Context, error codes, exports, patterns. This file covers server-specific conventions only.
 
+**Canonical agent instructions:** Maintain this repository's protocol in `AGENTS.md`. When an upstream skill selects or updates the root `CLAUDE.md`, apply that step to `AGENTS.md` instead. Keep the root free of a duplicate `CLAUDE.md`; the dependency's framework reference above retains its upstream filename.
+
 ---
 
 ## What's Next?
 
 When the user asks what's next or needs direction, suggest options based on the current project state. Common next steps:
 
-1. **Re-run the `setup` skill** — ensures CLAUDE.md, skills, structure, and metadata are populated and up to date with the current codebase
+1. **Re-run the framework `setup` skill** — ensures AGENTS.md, skills, structure, and metadata are populated and up to date with the current codebase
 2. **Run the `design-mcp-server` skill** — if the tool/resource surface hasn't been mapped yet, work through domain design
 3. **Add tools/resources/prompts** — scaffold new definitions using the `add-tool`, `add-app-tool`, `add-resource`, `add-prompt` skills
 4. **Add services** — scaffold domain service integrations using the `add-service` skill
@@ -277,7 +279,7 @@ src/
 
 ## Skills
 
-Skills are modular instructions in `framework-skills/` at the project root. Read them directly when a task matches — e.g., `framework-skills/add-tool/SKILL.md` when adding a tool. `bun run list-skills` prints the full registry. The directory is deliberately not `skills/`: Claude Code and Codex auto-load a plugin's root `skills/`, so a server that ships `.claude-plugin/` or `.codex-plugin/` would hand these development skills to every agent that installs it. Keep `skills/` free for skills meant for those agents.
+Skills are modular instructions in `framework-skills/` at the project root. Read them directly when a task matches — e.g., `framework-skills/add-tool/SKILL.md` when adding a tool. `mise run list-skills` prints the framework skill registry. The directory is deliberately not `skills/`: Claude Code and Codex auto-load a plugin's root `skills/`, so a server that ships `.claude-plugin/` or `.codex-plugin/` would hand these development skills to every agent that installs it. Keep `skills/` free for skills meant for those agents.
 
 **Agent skill directory:** Copy skills into the directory your agent discovers (Claude Code: `.claude/skills/`, others: equivalent). Skills then load as context without referencing `framework-skills/` paths. After framework updates, run the `maintenance` skill — Phase B re-syncs the agent directory.
 
@@ -311,7 +313,7 @@ Available skills:
 | `api-config` | AppConfig, parseConfig, env vars |
 | `api-context` | Context interface, RequestContext, logger, state, multi-round-trip input |
 | `api-errors` | McpError, JsonRpcErrorCode, error patterns |
-| `api-linter` | Definition linter rule catalog — invoked by `bun run lint:mcp` and `devcheck` |
+| `api-linter` | Definition linter rule catalog — invoked by `mise run lint:mcp` and `devcheck` |
 | `api-mirror` | MirrorService: persistent self-refreshing local mirror (embedded SQLite + FTS5) of a bulk upstream dataset — Tier 3 opt-in |
 | `api-services` | LLM, Speech, Graph services |
 | `api-testing` | createMockContext, test patterns |
@@ -327,29 +329,38 @@ When you complete a skill's checklist, check the boxes and add a completion time
 
 ## Commands
 
-**Runtime:** Scripts use Bun's native TypeScript execution — `bun run <cmd>` is the standard invocation. `npm run <cmd>` also works (npm delegates to bun).
+**Task entry point:** Use `mise run <task>` from this repository. `mise.toml` owns tool versions and task orchestration; the existing package scripts retain Bun's native TypeScript execution. `mise tasks` lists the current task surface. Setup and ordinary checks run without secret decryption; startup tasks inject secrets through fnox. Read [docs/tooling.md](docs/tooling.md) for setup, age-encrypted storage, and secret import. Preserve existing project Python code and tooling; prefer TypeScript when adapting the Python reference project's configuration.
 
 | Command | Purpose |
 |:--------|:--------|
-| `bun run build` | Compile TypeScript |
-| `bun run rebuild` | Clean + build |
-| `bun run clean` | Remove build artifacts |
-| `bun run devcheck` | Lint + format + typecheck + security + changelog sync |
-| `bun run audit:fix` | `bun audit fix` — upgrade vulnerable packages to the lowest safe version within existing ranges (`--dry-run` previews, `--latest` rewrites ranges). First response when `devcheck` flags a transitive advisory; then `bun update <name>`, then `bun dedupe` |
-| `bun run audit:refresh` | Delete `bun.lock` and reinstall. Last resort after `audit:fix`, `bun update <name>`, and `bun dedupe` — re-resolves every ranged dep (the framework pin included) and rewrites the lockfile as `lockfileVersion: 2` |
-| `bun run lint:mcp` | Run the MCP definition linter standalone (rule catalog: `api-linter` skill) |
-| `bun run lint:packaging` | Packaging surface checks — `server.json`/`manifest.json` env-var parity (run by devcheck) |
-| `bun run list-skills` | Print the skill registry |
-| `bun run tree` | Generate directory structure doc |
-| `bun run format` | Auto-fix formatting (safe fixes only) |
-| `bun run format:unsafe` | Also apply Biome's unsafe autofixes — review the diff; they can change behavior |
-| `bun run test` | Run tests (Vitest — use `bun run test`, not `bun test`) |
-| `bun run start:stdio` | Production mode (stdio) |
-| `bun run start:http` | Production mode (HTTP) |
-| `bun run changelog:build` | Regenerate `CHANGELOG.md` from `changelog/*.md` |
-| `bun run changelog:check` | Verify `CHANGELOG.md` is in sync (used by devcheck) |
-| `bun run release:github` | Create a GitHub Release from the latest annotated tag |
-| `bun run bundle` | Build, pack, and clean a `.mcpb` for one-click Claude Desktop install |
+| `mise run setup` | Install locked project dependencies after `mise install` |
+| `mise run build` | Compile TypeScript |
+| `mise run rebuild` | Clean + build |
+| `mise run clean` | Remove build artifacts |
+| `mise run check` | Read-only development checks, tests, and secret-leak guards |
+| `mise run devcheck` | Lint + format + typecheck + security + changelog sync |
+| `mise run lint` | Run lint checks |
+| `mise run typecheck` | Check TypeScript types |
+| `mise run audit:fix` | `bun audit fix` — upgrade vulnerable packages to the lowest safe version within existing ranges (`--dry-run` previews, `--latest` rewrites ranges). First response when `devcheck` flags a transitive advisory; then `bun update <name>`, then `bun dedupe` |
+| `mise run audit:refresh` | Delete `bun.lock` and reinstall. Last resort after `audit:fix`, `bun update <name>`, and `bun dedupe` — re-resolves every ranged dep (the framework pin included) and rewrites the lockfile as `lockfileVersion: 2` |
+| `mise run lint:mcp` | Run the MCP definition linter standalone (rule catalog: `api-linter` skill) |
+| `mise run lint:packaging` | Packaging surface checks — `server.json`/`manifest.json` env-var parity (run by devcheck) |
+| `mise run list-skills` | Print the framework skill registry |
+| `mise run tree` | Generate directory structure doc |
+| `mise run fmt` | Auto-fix formatting (safe fixes only; alias of `format`) |
+| `mise run format:unsafe` | Also apply Biome's unsafe autofixes — review the diff; they can change behavior |
+| `mise run test` | Run Vitest via `bun run test`; preserve this runner, never substitute `bun test` |
+| `mise run secrets:init` | Create or reuse the external age identity; preserve existing recipients |
+| `mise run secrets:check` | Check encrypted-storage policy without decrypting secrets |
+| `mise run secrets:verify` | Verify local secret decryption without printing values |
+| `mise run secrets:scan` | Scan working files and all Git history for leaked secrets |
+| `mise run secrets:exec -- <command>` | Run a command with fnox-injected secrets |
+| `mise run start:stdio` | Run the built server with fnox-injected secrets (stdio) |
+| `mise run start:http` | Run the built server with fnox-injected secrets (HTTP) |
+| `mise run changelog:build` | Regenerate `CHANGELOG.md` from `changelog/*.md` |
+| `mise run changelog:check` | Verify `CHANGELOG.md` is in sync (used by devcheck) |
+| `mise run release:github` | Create a GitHub Release from the latest annotated tag, within the gated release workflow |
+| `mise run bundle` | Build, pack, and clean a `.mcpb` for one-click Claude Desktop install |
 
 **CI is one file.** `.github/workflows/codeql.yml` is the only GitHub Actions workflow: CodeQL is GitHub-owned end to end, and the file runs only while the repo's CodeQL *default setup* is turned off. Verification — `devcheck`, tests, the release gates — runs locally; don't add a workflow that re-runs it.
 
@@ -357,7 +368,7 @@ When you complete a skill's checklist, check the boxes and add a completion time
 
 ## Bundling
 
-`npm run bundle` produces a `.mcpb` extension bundle for one-click install in Claude Desktop. The pack step is followed by `scripts/clean-mcpb.ts`, which prunes dev dependencies (`mcpb clean`) and strips two classes of `node_modules/**` content that root-anchored `.mcpbignore` patterns cannot reach: dependency-shipped agent docs (`framework-skills/`, `skills/`, `.claude/`, `.agents/`, `SKILL.md`) and platform-specific native bindings, which would otherwise lock the bundle to the platform it was packed on. A server using DataCanvas therefore ships a portable bundle without the DuckDB native — `@duckdb/node-api` is an optional peer loaded lazily, so canvas tools report an actionable install hint and every other tool works normally. MCPB is stdio-only — HTTP and Cloudflare Workers deployments are unaffected. Consumers who don't need it can delete `manifest.json` and `.mcpbignore`; `lint:packaging` skips cleanly.
+`mise run bundle` produces a `.mcpb` extension bundle for one-click install in Claude Desktop. The pack step is followed by `scripts/clean-mcpb.ts`, which prunes dev dependencies (`mcpb clean`) and strips two classes of `node_modules/**` content that root-anchored `.mcpbignore` patterns cannot reach: dependency-shipped agent docs (`framework-skills/`, `skills/`, `.claude/`, `.agents/`, `SKILL.md`) and platform-specific native bindings, which would otherwise lock the bundle to the platform it was packed on. A server using DataCanvas therefore ships a portable bundle without the DuckDB native — `@duckdb/node-api` is an optional peer loaded lazily, so canvas tools report an actionable install hint and every other tool works normally. MCPB is stdio-only — HTTP and Cloudflare Workers deployments are unaffected. Consumers who don't need it can delete `manifest.json` and `.mcpbignore`; `lint:packaging` skips cleanly.
 
 **Adding an env var requires both files:** `server.json` (registry discovery, `environmentVariables[]`) and `manifest.json` (bundle install UX, `mcp_config.env` + `user_config`). `lint:packaging` (run by `devcheck`) verifies the env var names match, that every `user_config` option is wired into `mcp_config.env` as `"X": "${user_config.X}"` (the host substitutes nothing else — `"${X}"` reaches the server as that literal string), and that an optional string option carries `"default": ""`.
 
@@ -367,7 +378,7 @@ When you complete a skill's checklist, check the boxes and add a completion time
 
 ## Changelog
 
-Directory-based, grouped by minor series via the `.x` semver-wildcard convention. Source of truth: `changelog/<major.minor>.x/<version>.md` (e.g. `changelog/0.1.x/0.1.0.md`) — one file per release, shipped in the npm package. At release, author the per-version file with a concrete version and date, then run `npm run changelog:build` to regenerate the rollup. `changelog/template.md` is a **pristine format reference** — never edited or moved; read it for the frontmatter + section layout when scaffolding. `CHANGELOG.md` is a **navigation index** (header + link + summary per version), regenerated by `npm run changelog:build` — devcheck hard-fails on drift; never hand-edit it.
+Directory-based, grouped by minor series via the `.x` semver-wildcard convention. Source of truth: `changelog/<major.minor>.x/<version>.md` (e.g. `changelog/0.1.x/0.1.0.md`) — one file per release, shipped in the npm package. At release, author the per-version file with a concrete version and date, then run `mise run changelog:build` to regenerate the rollup. `changelog/template.md` is a **pristine format reference** — never edited or moved; read it for the frontmatter + section layout when scaffolding. `CHANGELOG.md` is a **navigation index** (header + link + summary per version), regenerated by `mise run changelog:build` — devcheck hard-fails on drift; never hand-edit it.
 
 Each per-version file opens with YAML frontmatter:
 
@@ -411,6 +422,22 @@ import { getMyService } from '@/services/my-domain/my-service.js';
 
 ---
 
+## Agent skills
+
+### Issue tracker
+
+Use GitHub Issues in `darylwalsh/courtlistener-mcp`. Read `docs/agents/issue-tracker.md` before tracker operations.
+
+### Triage labels
+
+Use the five default Pocock triage labels. See `docs/agents/triage-labels.md` when triaging work.
+
+### Domain docs
+
+Use a single-context glossary and ADRs in `docs/decisions/`. Read `docs/agents/domain.md` before domain exploration.
+
+---
+
 ## Checklist
 
 - [ ] Zod schemas: all fields have `.describe()`, only JSON-Schema-serializable types (no `z.custom()`, `z.date()`, `z.transform()`, `z.bigint()`, `z.symbol()`, `z.void()`, `z.map()`, `z.set()`, `z.function()`, `z.nan()`)
@@ -427,4 +454,4 @@ import { getMyService } from '@/services/my-domain/my-service.js';
 - [ ] `.codex-plugin/plugin.json` populated — `name`, `version`, `description`, `repository`, `license` from `package.json`; `interface.displayName` = the unscoped repo name (never the npm scope — `lint:packaging` enforces this); `interface.shortDescription` from `package.json` description
 - [ ] `.codex-plugin/mcp.json` updated — server name key is the unscoped repo name; every user-supplied variable (API key, contact email, instance URL) is listed in `env_vars` so Codex forwards it from the user's environment. Never write `"KEY": ""` into `env` — an empty value replaces the user's exported key and is read as unset
 - [ ] `.claude-plugin/plugin.json` populated — `name`, `version`, `description`, `author`, `repository`, `license`, `keywords` from `package.json`; inline `mcpServers` entry keyed by the unscoped repo name. Every user-supplied variable is declared under `userConfig` (`type`, `title`, `description`; `sensitive: true` for keys and tokens; `required: true` or `default: ""`) and referenced from `env` as `"KEY": "${user_config.<option>}"` — mirror the `user_config` block in `manifest.json`. Never write `"KEY": ""` into `env`
-- [ ] `npm run devcheck` passes
+- [ ] `mise run check` passes

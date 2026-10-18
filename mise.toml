@@ -1,0 +1,158 @@
+[tools]
+age = "1.3.2"
+bun = "1.4.3"
+fnox = { version = "1.39.0", workflow = "release.yml" }
+gitleaks = "8.30.1"
+node = "24.20.0"
+
+# Non-secret machine overrides belong in ignored mise.local.toml.
+# Secrets are injected explicitly by fnox, never loaded by a cd hook.
+[task_config]
+includes = ["mise-tasks", "tasks/*.toml"]
+
+[tasks.setup]
+description = "Install locked project dependencies"
+run = "bun install --frozen-lockfile"
+
+[tasks.build]
+description = "Compile the MCP server"
+run = "bun run build"
+
+[tasks.rebuild]
+description = "Clean and compile the MCP server"
+run = "bun run rebuild"
+
+[tasks.clean]
+description = "Remove build artifacts"
+run = "bun run clean"
+
+[tasks.fmt]
+alias = "format"
+description = "Apply safe Biome formatting and lint fixes"
+run = "bun run format"
+
+[tasks."format:unsafe"]
+description = "Apply unsafe Biome fixes; review the resulting diff"
+run = "bun run format:unsafe"
+
+[tasks.lint]
+description = "Check Biome lint and formatting without writing"
+run = "bunx --no-install biome check ."
+
+[tasks.typecheck]
+description = "Check project TypeScript types"
+run = "bunx --no-install tsc --noEmit"
+
+[tasks.test]
+description = "Run the Vitest suite through the existing package script"
+run = "bun run test"
+
+[tasks.devcheck]
+description = "Run the project's lint, type, metadata and security checks"
+run = "bun run devcheck --no-fix"
+
+[tasks.check]
+description = "Validate lockfile, devcheck, Vitest and secret storage/leak checks"
+run = [
+  "mise run lock:check",
+  "mise run devcheck",
+  "mise run test",
+  "mise run secrets:check",
+  "mise run secrets:scan",
+]
+
+[tasks."lock:check"]
+description = "Validate package.json against bun.lock without changing the lock"
+run = "bun install --frozen-lockfile --lockfile-only --ignore-scripts"
+
+[tasks.audit]
+description = "Audit dependencies for known vulnerabilities"
+run = "bun audit"
+
+[tasks."audit:fix"]
+description = "Apply the existing dependency advisory repair workflow"
+run = "bun run audit:fix"
+
+[tasks."audit:refresh"]
+description = "Last resort: regenerate bun.lock and audit dependencies"
+run = "bun run audit:refresh"
+
+[tasks."secrets:init"]
+description = "Create or reuse an age identity outside the repo"
+run = "bun run scripts/secrets-init.ts"
+
+[tasks."secrets:check"]
+description = "Reject plaintext or malformed fnox entries without decrypting"
+run = "bun run scripts/check-secrets.ts"
+
+[tasks."secrets:verify"]
+description = "Decrypt project secrets and verify environment injection without printing values"
+run = "fnox --no-daemon --non-interactive exec -- bun run scripts/verify-secrets.ts"
+
+[tasks."secrets:exec"]
+description = "Run a command with fnox secrets: mise run secrets:exec -- <command>"
+raw = true
+raw_args = true
+run = "fnox exec --"
+
+[tasks."secrets:scan"]
+description = "Scan working files and all Git history with redacted Gitleaks output"
+run = [
+  "gitleaks dir . --redact --no-banner",
+  "gitleaks git . --log-opts=--all --redact --no-banner",
+]
+
+[tasks."secrets:staged"]
+description = "Scan staged changes with redacted Gitleaks output"
+run = "gitleaks git . --staged --redact --no-banner"
+
+[tasks."start:stdio"]
+description = "Start the built stdio server with fnox secrets"
+raw = true
+quiet = true
+run = "fnox exec -- bun run start:stdio"
+
+[tasks."start:http"]
+description = "Start the built HTTP server with fnox secrets"
+raw = true
+run = "fnox exec -- bun run start:http"
+
+[tasks."lint:mcp"]
+description = "Check MCP tool/resource/prompt definitions"
+run = "bun run lint:mcp"
+
+[tasks."lint:packaging"]
+description = "Check registry, bundle and plugin metadata"
+run = "bun run lint:packaging"
+
+[tasks.tree]
+description = "Regenerate docs/tree.md"
+run = "bun run tree --ignore=agent-user-msg --ignore=.specstory --ignore=.aws --ignore=.codex"
+
+[tasks."list-skills"]
+description = "List framework development skills"
+run = "bun run list-skills"
+
+[tasks."courts:snapshot"]
+description = "Refresh the court-name snapshot with credentials"
+run = "fnox exec -- bun run courts:snapshot"
+
+[tasks."changelog:build"]
+description = "Regenerate the changelog navigation index"
+run = "bun run changelog:build"
+
+[tasks."changelog:check"]
+description = "Verify the changelog index matches release entries"
+run = "bun run changelog:check"
+
+[tasks.bundle]
+description = "Build and pack a Claude Desktop extension"
+run = "bun run bundle"
+
+[tasks."release:github"]
+description = "Publish the latest annotated tag's release; gated release workflow only"
+run = "bun run release:github"
+
+[tasks."publish-mcp"]
+description = "Run the existing registry publisher; gated release workflow only"
+run = "bun run publish-mcp"

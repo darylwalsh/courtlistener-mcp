@@ -118,7 +118,7 @@ if (!existsSync(SKILLS_DIR)) {
         'which surfaced these development skills to every agent that installed the server.',
         '',
         'Fix: git mv skills framework-skills',
-        '     then update the path in CLAUDE.md/AGENTS.md, .mcpbignore (/framework-skills/),',
+        '     then update the path in AGENTS.md, .mcpbignore (/framework-skills/),',
         '     and .github/CONTRIBUTING.md, and regenerate docs/tree.md.',
       ].join('\n'),
     );

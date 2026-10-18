@@ -644,14 +644,15 @@ const ALL_CHECKS: Check[] = [
       // variable or stop word is not a marker.
       const baseCmd = ['git', 'grep', '-nwE', '(TODO|FIXME)'];
       // Exclude files where TODO/FIXME appears as prose or intentional stubs:
-      // changelogs, tests, this script, and the framework's skill prose wherever
-      // the maintenance sync copies it.
+      // changelogs, tests, imported reference docs, this script, and the
+      // framework's skill prose wherever the maintenance sync copies it.
       const excludes = [
         ':!CHANGELOG.md',
         ':!changelog/',
         ':!*.lock',
         ':!scripts/devcheck.ts',
         ':!tests/',
+        ':!agent-user-msg/docs/',
         ':!framework-skills/',
         ':!.claude/skills/',
         ':!.agents/skills/',
@@ -700,20 +701,18 @@ const ALL_CHECKS: Check[] = [
         ':(glob)**/secret*',
         ':(glob)**/secret*/**',
         ':(glob)**/.htpasswd',
+        // These are source/config files, not secret stores. Exclude them only
+        // from this filename check; content scanners still inspect them.
+        ':(exclude,literal).github/secret_scanning.yml',
+        ':(exclude,literal)scripts/secrets-init.ts',
+        ':(exclude,literal)agent-user-msg/docs/starter-project-python-mise-tooling/scripts/secrets-init.sh',
+        ':(exclude,glob)**/*.env.example',
+        ':(exclude,glob)**/*.env.template',
+        ':(exclude,glob)**/*.env.sample',
       ];
     },
-    // Success if output is empty OR only contains safe files: `.env` templates
-    // anywhere, and GitHub's secret scanning config at the one path it reads.
-    isSuccess: (result, _mode) => {
-      if (result.exitCode !== 0) return false;
-      const SAFE_SUFFIXES = ['.env.example', '.env.template', '.env.sample'];
-      const SAFE_PATHS = ['.github/secret_scanning.yml'];
-      const files = result.stdout.trim().split('\n').filter(Boolean);
-      const dangerous = files.filter(
-        (f) => !SAFE_PATHS.includes(f) && !SAFE_SUFFIXES.some((safe) => f.endsWith(safe)),
-      );
-      return dangerous.length === 0;
-    },
+    // Git filters safe paths, so both the verdict and summary show only findings.
+    isSuccess: (result) => result.exitCode === 0 && !result.stdout.trim(),
     tip: (c) =>
       `Add sensitive files to ${c.bold('.gitignore')} and run ${c.bold('git rm --cached <file>')}.`,
   },
@@ -800,7 +799,7 @@ const ALL_CHECKS: Check[] = [
     canFix: false,
     getCommand: () => ['bun', 'run', 'scripts/check-docs-sync.ts'],
     tip: (c) =>
-      `Edit both files together, or run ${c.bold('cp CLAUDE.md AGENTS.md')} (or reverse) to resync.`,
+      `Maintain ${c.bold('AGENTS.md')} as the canonical protocol and remove any duplicate root ${c.bold('CLAUDE.md')}.`,
   },
   {
     name: 'Skills Sync',

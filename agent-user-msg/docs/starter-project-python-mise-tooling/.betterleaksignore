@@ -1,0 +1,32 @@
+# Reviewed 2026-10-08: 12 documentation-only false positives in bundled skills.
+# Literal example passwords/URLs, including explicitly unsafe examples.
+# Scope: exact commit, path, rule, and line; skills remain fully scanned.
+62b80a673def127ae8523d93ccab86b1d9bb2725:.agents/skills/bash/references/SECURITY.md:generic-password:176
+62b80a673def127ae8523d93ccab86b1d9bb2725:.agents/skills/bash/references/SECURITY.md:generic-password:89
+62b80a673def127ae8523d93ccab86b1d9bb2725:.agents/skills/connect-mcp-server/SKILL.md:generic-credential-uri:331
+62b80a673def127ae8523d93ccab86b1d9bb2725:.agents/skills/connect-mcp-server/SKILL.md:generic-credential-uri:338
+62b80a673def127ae8523d93ccab86b1d9bb2725:.agents/skills/mise-environment-management/SKILL.md:generic-password:199
+62b80a673def127ae8523d93ccab86b1d9bb2725:.agents/skills/mise-environment-management/SKILL.md:generic-password:286
+62b80a673def127ae8523d93ccab86b1d9bb2725:.agents/skills/mise-environment-management/SKILL.md:generic-password:404
+62b80a673def127ae8523d93ccab86b1d9bb2725:.agents/skills/mise-expert/SKILL.md:generic-password:453
+62b80a673def127ae8523d93ccab86b1d9bb2725:.agents/skills/mise/references/environment-secrets.md:generic-credential-uri:130
+62b80a673def127ae8523d93ccab86b1d9bb2725:.agents/skills/pdf/SKILL.md:generic-password:216
+62b80a673def127ae8523d93ccab86b1d9bb2725:.agents/skills/pdf/reference.md:generic-password:340
+62b80a673def127ae8523d93ccab86b1d9bb2725:.agents/skills/sops-setup/references/sops-best-practices.md:generic-credential-uri:297
+# Staged False Positives (added 2026-10-08)
+:.agents/skills/fnox-configuration/SKILL.md:generic-password:384
+:.agents/skills/fnox-security-best-practices/SKILL.md:generic-password:25
+# Reviewed 2026-10-14: the same 12 documentation examples imported into this
+# reconciliation repository. Preserve the original standalone-repository entries.
+adac555338f6f47e9c3729eabb7bab18910f071d:starter-project-python-mise-tooling/.agents/skills/bash/references/SECURITY.md:generic-password:176
+adac555338f6f47e9c3729eabb7bab18910f071d:starter-project-python-mise-tooling/.agents/skills/bash/references/SECURITY.md:generic-password:89
+adac555338f6f47e9c3729eabb7bab18910f071d:starter-project-python-mise-tooling/.agents/skills/connect-mcp-server/SKILL.md:generic-credential-uri:331
+adac555338f6f47e9c3729eabb7bab18910f071d:starter-project-python-mise-tooling/.agents/skills/connect-mcp-server/SKILL.md:generic-credential-uri:338
+adac555338f6f47e9c3729eabb7bab18910f071d:starter-project-python-mise-tooling/.agents/skills/mise-environment-management/SKILL.md:generic-password:199
+adac555338f6f47e9c3729eabb7bab18910f071d:starter-project-python-mise-tooling/.agents/skills/mise-environment-management/SKILL.md:generic-password:286
+adac555338f6f47e9c3729eabb7bab18910f071d:starter-project-python-mise-tooling/.agents/skills/mise-environment-management/SKILL.md:generic-password:404
+adac555338f6f47e9c3729eabb7bab18910f071d:starter-project-python-mise-tooling/.agents/skills/mise-expert/SKILL.md:generic-password:453
+adac555338f6f47e9c3729eabb7bab18910f071d:starter-project-python-mise-tooling/.agents/skills/mise/references/environment-secrets.md:generic-credential-uri:130
+adac555338f6f47e9c3729eabb7bab18910f071d:starter-project-python-mise-tooling/.agents/skills/pdf/SKILL.md:generic-password:216
+adac555338f6f47e9c3729eabb7bab18910f071d:starter-project-python-mise-tooling/.agents/skills/pdf/reference.md:generic-password:340
+adac555338f6f47e9c3729eabb7bab18910f071d:starter-project-python-mise-tooling/.agents/skills/sops-setup/references/sops-best-practices.md:generic-credential-uri:297

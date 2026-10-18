@@ -2,6 +2,7 @@
   "depcheck": {
     "ignores": [
       "@types/*",
+      "bun",
       "pino-pretty",
       "typescript",
       "tsc-alias",

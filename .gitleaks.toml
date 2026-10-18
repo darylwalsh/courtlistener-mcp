@@ -1,0 +1,14 @@
+title = "CourtListener development secret scanning"
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Installed dependencies and generated build/cache output"
+paths = [
+  '''(^|/)node_modules/''',
+  '''(^|/)\.git/''',
+  '''(^|/)dist/''',
+  '''(^|/)coverage/''',
+  '''(^|/)\.cache/''',
+]

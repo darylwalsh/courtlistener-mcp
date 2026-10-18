@@ -12,3 +12,12 @@
 /biome.json
 /tsconfig*.json
 /vitest.config.ts
+/fnox*.toml
+/.fnox*.toml
+/mise*.toml
+/.mise*.toml
+/agent-user-msg/
+/.specstory/
+/.gitleaks*
+/age.txt
+/*.agekey

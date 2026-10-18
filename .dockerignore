@@ -165,6 +165,14 @@ coverage/
 # ENVIRONMENT & CONFIGURATION
 # =============================================================================
 .env*
+fnox*.toml
+.fnox*.toml
+mise*.toml
+.mise*.toml
+agent-user-msg/
+.specstory/
+age.txt
+*.agekey
 .mcpregistry_github_token
 .mcpregistry_registry_token
 .sample-env
